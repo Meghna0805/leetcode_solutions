@@ -1,37 +1,42 @@
 class Solution {
 public:
-    bool canFinish(int numCourses, vector<vector<int>>& prerequisites) {
-        vector<int> inDegree(numCourses, 0);
-        vector<vector<int>> adj(numCourses);
-        //Build Graph and indegree array
-        for(auto& pre: prerequisites){
-            int a = pre[0], b = pre[1];
-            adj[b].push_back(a);
-            inDegree[a]++;
-        }        
-
-        //Create a queue to store the courses with indegree 0
-        queue<int> q;
-        //Start with all nodes with indegree 0
-        for(int i=0; i<numCourses; i++){
-            if(inDegree[i] == 0){
-                q.push(i);
+    bool dfs(int node, vector<int>& visited, vector<int>& recStack, vector<vector<int>>& adj){
+        visited[node] = true;
+        recStack[node] = true;
+        for(int neighbor: adj[node]){
+            //check if the neighbor is visited
+            if(!visited[neighbor]){
+                //if its not visited then call dfs recursively and return true if recursive calls gives true
+                if(dfs(neighbor, visited, recStack, adj)){
+                    return true;
+                }
+            }
+            //here check if the neighbor is already in recusion stack or not
+            else if(recStack[neighbor]){
+                return true;
             }
         }
+        recStack[node] = false;
+        return false;
+    }
+    bool canFinish(int numCourses, vector<vector<int>>& prerequisites) {
+        vector<vector<int>> adj(numCourses);
 
-        int count = 0;//count of courses that can be completed
+        for(auto pre: prerequisites){
+            int a = pre[0], b = pre[1];
+            adj[b].push_back(a);
+        }
 
-        while(!q.empty()){
-            int curr = q.front();
-            q.pop();
-            count++;
-            for(int neighbor: adj[curr]){
-                inDegree[neighbor]--;
-                if(inDegree[neighbor] == 0){
-                    q.push(neighbor);
+        vector<int> visited(numCourses, false);
+        vector<int> recStack(numCourses, false);
+
+        for(int node=0; node<numCourses; node++){
+            if(!visited[node]){
+                if(dfs(node, visited, recStack, adj)){
+                    return false;
                 }
             }
         }
-        return count == numCourses;
+        return true;
     }
 };
