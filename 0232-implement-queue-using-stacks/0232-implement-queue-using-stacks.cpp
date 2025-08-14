@@ -1,39 +1,36 @@
 class MyQueue {
 public:
-    stack<int> inStack, outStack;
-
-     void ifTransferNeeded(){
-            if(outStack.empty()){
-                while(!inStack.empty()){
-                    outStack.push(inStack.top());
-                    inStack.pop();
-                }
-            }
-        }
+    stack<int> s1, s2;
     MyQueue() {
-       
+        
     }
     
     void push(int x) {
-        inStack.push(x);
+        //We will empty s1 into s2 and add the new element in s1 then bring back elements from s2 to s1
+        while(!s1.empty()){
+            s2.push(s1.top());
+            s1.pop();
+        }
+        s1.push(x);
+        while(!s2.empty()){
+            s1.push(s2.top());
+            s2.pop();
+        }
     }
     
     int pop() {
-        ifTransferNeeded();
-        int val = outStack.top();
-        outStack.pop();
+        int val = s1.top();
+        s1.pop();
         return val;
         
     }
     
     int peek() {
-        ifTransferNeeded();
-        return outStack.top();
+        return s1.top();
     }
     
     bool empty() {
-        return inStack.empty() && outStack.empty();
-        
+        return s1.empty();
     }
 };
 
